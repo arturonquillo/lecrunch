@@ -1,0 +1,49 @@
+services:
+  mariadb:
+    image: mariadb:10.8
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+      - --skip-innodb-read-only-compressed
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123"]
+      timeout: 20s
+      retries: 10
+      interval: 5s
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 3s
+      retries: 5
+      interval: 5s
+    restart: unless-stopped
+
+  frappe:
+    image: frappe/bench:latest
+    command: bash /workspace/init.sh
+    environment:
+      - SHELL=/bin/bash
+    working_dir: /home/frappe
+    volumes:
+      - .:/workspace
+    ports:
+      - "8000:8000"  # Frappe site
+      - "9000:9000"  # Socketio
+      - "8080:8080"  # Frontend dev server
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  mariadb-data:
