@@ -1,8 +1,8 @@
-# Frappe Builder - Docker Setup ✨
+# Frappe Builder + ERPNext - Docker Setup ✨
 
 ¡**FUNCIONA PERFECTAMENTE**! 🎉
 
-Este proyecto implementa **Frappe Builder** usando Docker, basado en el repositorio oficial de [frappe/builder](https://github.com/frappe/builder).
+Este proyecto implementa **Frappe Builder** y **ERPNext** usando Docker, basado en los repositorios oficiales de [frappe/builder](https://github.com/frappe/builder) y [frappe/erpnext](https://github.com/frappe/erpnext).
 
 ## 🚀 Instalación Rápida
 
@@ -26,7 +26,8 @@ Una vez completada la instalación:
 
 - **🏠 Sitio principal**: http://builder.localhost:8000
 - **🔧 Builder interface**: http://builder.localhost:8000/builder
-- **👨‍💻 Dev server**: http://builder.localhost:8080
+- **� ERPNext**: http://builder.localhost:8000/desk
+- **�👨‍💻 Dev server**: http://builder.localhost:8080
 
 **Credenciales:**
 - Usuario: `Administrator`
@@ -66,7 +67,9 @@ frape2/
 ## 🔧 Servicios
 
 - **MariaDB 10.8**: Base de datos con healthcheck
-- **Redis Alpine**: Cache y queues con healthcheck  
+- **Redis Alpine**: Cache y queues con healthcheck
+- **Frappe Builder**: Constructor visual de aplicaciones web
+- **ERPNext**: Sistema integral de gestión empresarial (ERP)  
 - **Frappe/Bench**: Aplicación principal con Builder
 
 ## ⚡ Características Técnicas
@@ -76,6 +79,7 @@ frape2/
 - ✅ **Dependencias Node.js** instaladas correctamente
 - ✅ **Script robusto** con manejo de errores
 - ✅ **Configuración Docker** optimizada
+- ✅ **Frappe Builder + ERPNext** integrados en una sola instancia
 
 ## 🐛 Solución de Problemas
 
@@ -92,6 +96,7 @@ Si algo no funciona:
 - ❌ "Redis URL must specify scheme" → ✅ URLs Redis con redis://
 - ❌ Contenedores reiniciándose → ✅ Healthchecks y configuración estable
 - ❌ Script colgándose → ✅ Lógica de instalación robusta
+- ❌ Solo Frappe Builder → ✅ Builder + ERPNext completamente integrados
 
 ---
 

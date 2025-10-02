@@ -61,6 +61,10 @@ cd apps/frappe
 yarn install --network-timeout 100000
 cd ../..
 
+# Install ERPNext
+echo "📥 Getting ERPNext..."
+bench get-app erpnext --branch version-15
+
 # Install Builder
 echo "📥 Getting Frappe Builder..."
 bench get-app builder --branch develop
@@ -72,6 +76,9 @@ bench new-site builder.localhost \
     --mariadb-root-password 123 \
     --admin-password admin \
     --no-mariadb-socket
+
+echo "📱 Installing ERPNext..."
+bench --site builder.localhost install-app erpnext
 
 echo "📱 Installing Builder app..."
 bench --site builder.localhost install-app builder
