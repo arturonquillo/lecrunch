@@ -1,8 +1,34 @@
+# Frappe Builder + ERP## 🌐 Acceso por Subdominios
+
+Una vez completada la instalación, cada aplicación tiene su propio subdominio:
+
+### 🎯 **Acceso por Rutas:**
+- **🏠 Frappe Desk**: http://localhost:8000/desk
+  - Panel de administración del framework
+  - Gestión de usuarios, configuración, etc.
+  
+- **🔧 Frappe Builder**: 
+  - http://localhost:8000/apps/builder
+  - http://localhost:8000/builder (acceso directo)
+  - Constructor visual de aplicaciones web
+
+- **📊 ERPNext**: 
+  - http://localhost:8000/apps/erpnext  
+  - http://localhost:8000/app (acceso directo)
+  - Sistema completo de gestión empresarial
+
+- **👨‍💻 Dev Server**: http://localhost:8080
+  - Servidor de desarrollo para frontend
+
+### 🔑 **Credenciales (para todos los sitios):**
+- Usuario: `Administrator`
+- Contraseña: `admin`-Subdomain Docker Setup ✨
+
 # Frappe Builder + ERPNext - Docker Setup ✨
 
 ¡**FUNCIONA PERFECTAMENTE**! 🎉
 
-Este proyecto implementa **Frappe Builder** y **ERPNext** usando Docker, basado en los repositorios oficiales de [frappe/builder](https://github.com/frappe/builder) y [frappe/erpnext](https://github.com/frappe/erpnext).
+Este proyecto implementa **Frappe Framework**, **Frappe Builder** y **ERPNext** usando Docker en un solo sitio con múltiples apps accesibles por rutas, basado en los repositorios oficiales de [frappe/builder](https://github.com/frappe/builder) y [frappe/erpnext](https://github.com/frappe/erpnext).
 
 ## 🚀 Instalación Rápida
 
@@ -19,6 +45,24 @@ docker compose logs -f frappe
 
 # 4. Cuando veas "HTTP/1.1" en los logs, ¡está listo!
 ```
+
+## 🏗️ Arquitectura Estándar de Frappe
+
+Este setup utiliza la configuración estándar de Frappe con **múltiples apps en un solo sitio**:
+
+```
+Cliente → localhost:8000
+├── /desk                 → Frappe Framework (administración)
+├── /apps/builder         → Frappe Builder 
+├── /builder              → Acceso directo a Builder
+├── /apps/erpnext         → ERPNext
+└── /app                  → Acceso directo a ERPNext
+```**Ventajas del método estándar:**
+- 🎯 **Configuración típica** de Frappe
+- 🔒 **Todas las apps en un sitio** 
+- 📊 **Datos compartidos** entre aplicaciones
+- 🚀 **Más simple** de administrar
+- ⚡ **URLs estándar** de Frappe
 
 ## 🌐 Acceso
 
@@ -57,8 +101,8 @@ docker compose exec frappe bash
 
 ```
 frape2/
-├── docker-compose.yml    # Servicios Docker
-├── init.sh              # Script de instalación 
+├── docker-compose.yml    # Servicios Docker simples
+├── init.sh              # Script instalación sitio único con múltiples apps
 ├── manage.sh            # Comandos útiles
 ├── status.sh            # Verificar estado
 └── README.md           # Este archivo
@@ -67,19 +111,20 @@ frape2/
 ## 🔧 Servicios
 
 - **MariaDB 10.8**: Base de datos con healthcheck
-- **Redis Alpine**: Cache y queues con healthcheck
-- **Frappe Builder**: Constructor visual de aplicaciones web
-- **ERPNext**: Sistema integral de gestión empresarial (ERP)  
-- **Frappe/Bench**: Aplicación principal con Builder
+- **Redis Alpine**: Cache y queues con healthcheck  
+- **Frappe/Bench**: Contenedor con sitio único:
+  - **localhost**: Frappe + Builder + ERPNext (todas las apps)
 
 ## ⚡ Características Técnicas
 
+- ✅ **Configuración estándar** de Frappe
+- ✅ **Múltiples apps en un sitio** 
+- ✅ **Rutas estándar** (/apps/builder, /apps/erpnext)
 - ✅ **Healthchecks** para todos los servicios
 - ✅ **URLs Redis corregidas** (redis://redis:6379)
 - ✅ **Dependencias Node.js** instaladas correctamente
 - ✅ **Script robusto** con manejo de errores
-- ✅ **Configuración Docker** optimizada
-- ✅ **Frappe Builder + ERPNext** integrados en una sola instancia
+- ✅ **Acceso unificado** a todas las aplicaciones
 
 ## 🐛 Solución de Problemas
 

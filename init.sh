@@ -23,7 +23,7 @@ wait_for_redis() {
 }
 
 # Check if bench is properly initialized
-if [ -d "/home/frappe/frappe-bench/apps/frappe" ] && [ -d "/home/frappe/frappe-bench/sites/builder.localhost" ]; then
+if [ -d "/home/frappe/frappe-bench/apps/frappe" ] && [ -d "/home/frappe/frappe-bench/sites/localhost" ]; then
     echo "🌐 Complete setup exists, starting services..."
     cd /home/frappe/frappe-bench
     bench start
@@ -69,25 +69,33 @@ bench get-app erpnext --branch version-15
 echo "📥 Getting Frappe Builder..."
 bench get-app builder --branch develop
 
-# Create site
-echo "🏗️  Creating site builder.localhost..."
-bench new-site builder.localhost \
+# Create single site with all apps
+echo "🏗️  Creating main site (localhost)..."
+bench new-site localhost \
     --force \
     --mariadb-root-password 123 \
     --admin-password admin \
     --no-mariadb-socket
 
-echo "📱 Installing ERPNext..."
-bench --site builder.localhost install-app erpnext
+echo "📱 Installing ERPNext on localhost..."
+bench --site localhost install-app erpnext
 
-echo "📱 Installing Builder app..."
-bench --site builder.localhost install-app builder
+echo "📱 Installing Builder on localhost..."
+bench --site localhost install-app builder
 
-echo "⚙️  Configuring site..."
-bench --site builder.localhost set-config developer_mode 1
-bench --site builder.localhost set-config mute_emails 1
-bench --site builder.localhost clear-cache
-bench use builder.localhost
+echo "⚙️  Configuring site for development..."
+bench --site localhost set-config developer_mode 1
+bench --site localhost set-config mute_emails 1
+bench --site localhost clear-cache
+
+# Set as default site
+bench use localhost
+
+echo "✅ Single site configuration complete!"
+echo "📝 Available apps:"
+echo "   - Frappe Desk: /desk"
+echo "   - Builder: /apps/builder or /builder"  
+echo "   - ERPNext: /apps/erpnext or /app"
 
 echo "✅ Installation complete!"
 

@@ -35,7 +35,7 @@ services:
     volumes:
       - .:/workspace
     ports:
-      - "8000:8000"  # Frappe site
+      - "8000:8000"  # Main Frappe site
       - "9000:9000"  # Socketio
       - "8080:8080"  # Frontend dev server
     depends_on:
