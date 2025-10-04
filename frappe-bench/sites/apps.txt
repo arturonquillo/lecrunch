@@ -3,3 +3,4 @@ erpnext
 builder
 ecommerce_integrations
 payments
+webshop
