@@ -1,4 +1,13 @@
-# Frappe Builder + ERP## 🌐 Acceso por Subdominios
+# Frappe Builder + - **🛒 Ecommerce Integrations**: 
+  - http://localhost:8000/apps/ecommerce_integrations
+  - Integraciones de comercio electrónico (Shopify, WooCommerce, etc.)
+
+- **🏪 Webshop**: 
+  - http://localhost:8000/apps/webshop
+  - Tienda online completa con carrito de compras
+
+- **👨‍💻 Dev Server**: http://localhost:8080
+  - Servidor de desarrollo para frontend🌐 Acceso por Subdominios
 
 Una vez completada la instalación, cada aplicación tiene su propio subdominio:
 
@@ -17,7 +26,11 @@ Una vez completada la instalación, cada aplicación tiene su propio subdominio:
   - http://localhost:8000/app (acceso directo)
   - Sistema completo de gestión empresarial
 
-- **👨‍💻 Dev Server**: http://localhost:8080
+- **� Ecommerce Integrations**: 
+  - http://localhost:8000/apps/ecommerce_integrations
+  - Integraciones de comercio electrónico (Shopify, WooCommerce, etc.)
+
+- **�👨‍💻 Dev Server**: http://localhost:8080
   - Servidor de desarrollo para frontend
 
 ### 🔑 **Credenciales (para todos los sitios):**
@@ -28,7 +41,7 @@ Una vez completada la instalación, cada aplicación tiene su propio subdominio:
 
 ¡**FUNCIONA PERFECTAMENTE**! 🎉
 
-Este proyecto implementa **Frappe Framework**, **Frappe Builder** y **ERPNext** usando Docker en un solo sitio con múltiples apps accesibles por rutas, basado en los repositorios oficiales de [frappe/builder](https://github.com/frappe/builder) y [frappe/erpnext](https://github.com/frappe/erpnext).
+Este proyecto implementa **Frappe Framework**, **Frappe Builder**, **ERPNext**, **Ecommerce Integrations** y **Webshop** usando Docker en un solo sitio con múltiples apps accesibles por rutas, basado en los repertorios oficiales de [frappe/builder](https://github.com/frappe/builder), [frappe/erpnext](https://github.com/frappe/erpnext), [frappe/ecommerce_integrations](https://github.com/frappe/ecommerce_integrations) y [frappe/webshop](https://github.com/frappe/webshop).
 
 ## 🚀 Instalación Rápida
 
@@ -52,11 +65,13 @@ Este setup utiliza la configuración estándar de Frappe con **múltiples apps e
 
 ```
 Cliente → localhost:8000
-├── /desk                 → Frappe Framework (administración)
-├── /apps/builder         → Frappe Builder 
-├── /builder              → Acceso directo a Builder
-├── /apps/erpnext         → ERPNext
-└── /app                  → Acceso directo a ERPNext
+├── /desk                        → Frappe Framework (administración)
+├── /apps/builder                → Frappe Builder 
+├── /builder                     → Acceso directo a Builder
+├── /apps/erpnext                → ERPNext
+├── /app                         → Acceso directo a ERPNext
+├── /apps/ecommerce_integrations → Ecommerce Integrations
+└── /apps/webshop                → Webshop (Tienda online)
 ```**Ventajas del método estándar:**
 - 🎯 **Configuración típica** de Frappe
 - 🔒 **Todas las apps en un sitio** 
@@ -113,7 +128,7 @@ frape2/
 - **MariaDB 10.8**: Base de datos con healthcheck
 - **Redis Alpine**: Cache y queues con healthcheck  
 - **Frappe/Bench**: Contenedor con sitio único:
-  - **localhost**: Frappe + Builder + ERPNext (todas las apps)
+  - **localhost**: Frappe + Builder + ERPNext + Ecommerce + Webshop
 
 ## ⚡ Características Técnicas
 

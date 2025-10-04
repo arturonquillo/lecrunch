@@ -69,6 +69,18 @@ bench get-app erpnext --branch version-15
 echo "📥 Getting Frappe Builder..."
 bench get-app builder --branch develop
 
+# Install Ecommerce Integrations
+echo "📥 Getting Ecommerce Integrations..."
+bench get-app ecommerce_integrations
+
+# Install Payments (dependency for webshop)
+echo "📥 Getting Payments..."
+bench get-app payments
+
+# Install Webshop
+echo "📥 Getting Webshop..."
+bench get-app webshop
+
 # Create single site with all apps
 echo "🏗️  Creating main site (localhost)..."
 bench new-site localhost \
@@ -83,6 +95,15 @@ bench --site localhost install-app erpnext
 echo "📱 Installing Builder on localhost..."
 bench --site localhost install-app builder
 
+echo "📱 Installing Ecommerce Integrations on localhost..."
+bench --site localhost install-app ecommerce_integrations
+
+echo "📱 Installing Payments on localhost..."
+bench --site localhost install-app payments
+
+echo "📱 Installing Webshop on localhost..."
+bench --site localhost install-app webshop
+
 echo "⚙️  Configuring site for development..."
 bench --site localhost set-config developer_mode 1
 bench --site localhost set-config mute_emails 1
@@ -96,6 +117,9 @@ echo "📝 Available apps:"
 echo "   - Frappe Desk: /desk"
 echo "   - Builder: /apps/builder or /builder"  
 echo "   - ERPNext: /apps/erpnext or /app"
+echo "   - Ecommerce Integrations: /apps/ecommerce_integrations"
+echo "   - Payments: /apps/payments"
+echo "   - Webshop: /apps/webshop"
 
 echo "✅ Installation complete!"
 
