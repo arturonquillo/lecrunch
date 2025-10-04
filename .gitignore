@@ -26,6 +26,17 @@ frappe-bench/apps/custom/**/__pycache__/
 frappe-bench/apps/custom/**/node_modules/
 frappe-bench/apps/custom/**/.DS_Store
 
+# Database Backups - Estrategia inteligente
+# Versionar solo backups importantes (pequeños), no temporales (grandes)
+frappe-bench/backups/database_*.sql.gz    # Backups automáticos diarios - NO versionar
+frappe-bench/backups/dev_*.sql.gz         # Backups de desarrollo - NO versionar  
+frappe-bench/backups/files_*.tar          # Archivos grandes - NO versionar
+
+# SÍ versionar backups importantes:
+!frappe-bench/backups/production_*.sql.gz
+!frappe-bench/backups/staging_*.sql.gz  
+!frappe-bench/backups/milestone_*.sql.gz
+
 # Logs
 *.log
 logs/
