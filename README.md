@@ -101,15 +101,59 @@ docker compose ps
 # Ver logs en tiempo real
 docker compose logs -f frappe
 
-# Detener
+# Detener (conserva apps y sitios)
 docker compose down
 
-# Reiniciar desde cero (elimina datos)
-docker compose down -v
-docker compose up -d
+# Reiniciar completamente (conserva apps y sitios)
+docker compose down && docker compose up -d
 
+# Eliminar TODO incluyendo volúmenes (CUIDADO: borra desarrollo)
+docker compose down -v
+
+# Acceder al contenedor para desarrollo
+docker compose exec frappe bash
+```
+
+## 🔧 Desarrollo y Personalización
+
+### **📁 Volúmenes Externos Persistentes ✅**
+**NUEVA FUNCIONALIDAD:** Todo el desarrollo se conserva como volumen externo:
+- `./frappe-bench/` - **Volumen completo persistente** montado desde el host
+  - `apps/frappe/` - Framework core (externo)
+  - `apps/erpnext/` - ERP application (externo)  
+  - `apps/builder/` - Page builder (externo)
+  - `apps/ecommerce_integrations/` - E-commerce integrations (externo)
+  - `apps/payments/` - Payment processing (externo)
+  - `apps/webshop/` - Web store (externo)
+  - `apps/custom/` - Tus apps personalizadas (externo)
+  - `sites/` - Site configurations (externo)
+  - `env/` - Python environment (externo)
+
+**🎯 Beneficios del Volumen Externo:**
+- ✅ **Edición directa**: Modifica código en `/Users/moshe/Projects/frape2/frappe-bench/`
+- ✅ **Persistencia total**: Cambios sobreviven recreación de contenedores
+- ✅ **Version control**: Commit apps y modificaciones personalizadas
+- ✅ **Desarrollo ágil**: Sin reinstalaciones entre reinicios
+
+### **Comandos de Desarrollo**
+```bash
 # Acceder al contenedor
 docker compose exec frappe bash
+
+# Una vez dentro del contenedor:
+cd /home/frappe/frappe-bench
+
+# Crear nueva app personalizada
+bench new-app mi_app_custom
+
+# Instalar app personalizada
+bench --site localhost install-app mi_app_custom
+
+# Migrar después de cambios
+bench --site localhost migrate
+
+# Reiniciar servicios
+bench restart
 ```
 
 ## 📁 Estructura
@@ -135,6 +179,8 @@ frape2/
 - ✅ **Configuración estándar** de Frappe
 - ✅ **Múltiples apps en un sitio** 
 - ✅ **Rutas estándar** (/apps/builder, /apps/erpnext)
+- ✅ **Volúmenes persistentes** para desarrollo
+- ✅ **Apps y sitios conservados** entre reinicios
 - ✅ **Healthchecks** para todos los servicios
 - ✅ **URLs Redis corregidas** (redis://redis:6379)
 - ✅ **Dependencias Node.js** instaladas correctamente

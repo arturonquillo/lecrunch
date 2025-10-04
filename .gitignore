@@ -1,6 +1,31 @@
 # Docker volumes
 mariadb-data/
 
+# Frappe development - versiona solo apps personalizadas y config
+frappe-bench/apps/frappe/
+frappe-bench/apps/erpnext/
+frappe-bench/apps/builder/
+frappe-bench/apps/ecommerce_integrations/
+frappe-bench/apps/payments/
+frappe-bench/apps/webshop/
+frappe-bench/env/
+frappe-bench/logs/
+frappe-bench/sites/assets/
+frappe-bench/sites/*.db
+frappe-bench/sites/localhost/
+frappe-bench/.DS_Store
+
+# But keep custom apps and configuration
+# frappe-bench/apps/custom/ - TUS APPS PERSONALIZADAS
+# frappe-bench/sites/apps.txt - Configuración de apps
+# frappe-bench/sites/common_site_config.json - Configuración del sitio
+
+# Ignore temp files in custom apps
+frappe-bench/apps/custom/**/*.pyc
+frappe-bench/apps/custom/**/__pycache__/
+frappe-bench/apps/custom/**/node_modules/
+frappe-bench/apps/custom/**/.DS_Store
+
 # Logs
 *.log
 logs/

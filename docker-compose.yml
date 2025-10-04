@@ -33,7 +33,9 @@ services:
       - SHELL=/bin/bash
     working_dir: /home/frappe
     volumes:
-      - .:/workspace
+      - ./init.sh:/workspace/init.sh:ro
+      # Mount entire frappe-bench for persistent development
+      - ./frappe-bench:/home/frappe/frappe-bench
     ports:
       - "8000:8000"  # Main Frappe site
       - "9000:9000"  # Socketio

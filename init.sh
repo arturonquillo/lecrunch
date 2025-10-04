@@ -2,7 +2,7 @@
 
 set -e
 
-echo "=== FRAPPE BUILDER INSTALLATION SCRIPT ==="
+echo "=== FRAPPE BUILDER STARTUP SCRIPT ==="
 
 # Function to wait for MariaDB
 wait_for_mariadb() {
@@ -22,107 +22,63 @@ wait_for_redis() {
     echo "✅ Redis is ready!"
 }
 
-# Check if bench is properly initialized
-if [ -d "/home/frappe/frappe-bench/apps/frappe" ] && [ -d "/home/frappe/frappe-bench/sites/localhost" ]; then
-    echo "🌐 Complete setup exists, starting services..."
-    cd /home/frappe/frappe-bench
-    bench start
-    exit 0
-fi
-
-echo "🚀 Creating new bench installation..."
-
 # Wait for services
 wait_for_mariadb
 wait_for_redis
 
-# Remove any incomplete bench directory
-rm -rf /home/frappe/frappe-bench
+cd /home/frappe/frappe-bench
 
-# Create bench
-echo "📦 Initializing bench..."
-bench init --skip-redis-config-generation frappe-bench --version version-15
-cd frappe-bench
+# Ensure apps are properly installed in the Python environment
+echo "🔧 Installing Python packages for all apps..."
+for app in apps/*/; do
+    if [ -f "$app/setup.py" ] || [ -f "$app/pyproject.toml" ]; then
+        app_name=$(basename "$app")
+        echo "📦 Installing $app_name..."
+        env/bin/python -m pip install --quiet --upgrade -e "$app" || echo "⚠️  Warning: Could not install $app_name"
+    fi
+done
 
-# Configure for Docker
-echo "🔧 Configuring for Docker environment..."
-bench set-mariadb-host mariadb
-bench set-redis-cache-host redis://redis:6379
-bench set-redis-queue-host redis://redis:6379
-bench set-redis-socketio-host redis://redis:6379
+# Configure bench for Docker if not already configured
+if ! grep -q "mariadb" sites/common_site_config.json 2>/dev/null; then
+    echo "🔧 Configuring bench for Docker environment..."
+    bench set-mariadb-host mariadb
+    bench set-redis-cache-host redis://redis:6379
+    bench set-redis-queue-host redis://redis:6379
+    bench set-redis-socketio-host redis://redis:6379
+fi
 
-# Clean Procfile
-sed -i '/redis/d' ./Procfile
-sed -i '/watch/d' ./Procfile
+# Create site if it doesn't exist
+if [ ! -d "sites/localhost" ]; then
+    echo "🏗️  Creating localhost site..."
+    bench new-site localhost \
+        --force \
+        --mariadb-root-password 123 \
+        --admin-password admin \
+        --no-mariadb-socket
 
-# Install Node dependencies for Frappe
-echo "📦 Installing Node.js dependencies for Frappe..."
-cd apps/frappe
-yarn install --network-timeout 100000
-cd ../..
+    echo "📱 Installing apps on localhost..."
+    bench --site localhost install-app erpnext --force
+    bench --site localhost install-app builder --force
+    bench --site localhost install-app ecommerce_integrations --force
+    bench --site localhost install-app payments --force
+    # Skip webshop for now - install manually later if needed
 
-# Install ERPNext
-echo "📥 Getting ERPNext..."
-bench get-app erpnext --branch version-15
+    echo "⚙️  Configuring site..."
+    bench --site localhost set-config developer_mode 1
+    bench --site localhost set-config mute_emails 1
+    bench --site localhost clear-cache
 
-# Install Builder
-echo "📥 Getting Frappe Builder..."
-bench get-app builder --branch develop
+    # Set as default site
+    bench use localhost
+else
+    echo "✅ Site localhost already exists"
+fi
 
-# Install Ecommerce Integrations
-echo "📥 Getting Ecommerce Integrations..."
-bench get-app ecommerce_integrations
-
-# Install Payments (dependency for webshop)
-echo "📥 Getting Payments..."
-bench get-app payments
-
-# Install Webshop
-echo "📥 Getting Webshop..."
-bench get-app webshop
-
-# Create single site with all apps
-echo "🏗️  Creating main site (localhost)..."
-bench new-site localhost \
-    --force \
-    --mariadb-root-password 123 \
-    --admin-password admin \
-    --no-mariadb-socket
-
-echo "📱 Installing ERPNext on localhost..."
-bench --site localhost install-app erpnext
-
-echo "📱 Installing Builder on localhost..."
-bench --site localhost install-app builder
-
-echo "📱 Installing Ecommerce Integrations on localhost..."
-bench --site localhost install-app ecommerce_integrations
-
-echo "📱 Installing Payments on localhost..."
-bench --site localhost install-app payments
-
-echo "📱 Installing Webshop on localhost..."
-bench --site localhost install-app webshop
-
-echo "⚙️  Configuring site for development..."
-bench --site localhost set-config developer_mode 1
-bench --site localhost set-config mute_emails 1
-bench --site localhost clear-cache
-
-# Set as default site
-bench use localhost
-
-echo "✅ Single site configuration complete!"
-echo "📝 Available apps:"
-echo "   - Frappe Desk: /desk"
-echo "   - Builder: /apps/builder or /builder"  
-echo "   - ERPNext: /apps/erpnext or /app"
-echo "   - Ecommerce Integrations: /apps/ecommerce_integrations"
-echo "   - Payments: /apps/payments"
-echo "   - Webshop: /apps/webshop"
-
-echo "✅ Installation complete!"
+echo "✅ Setup complete! Available at:"
+echo "   - Frappe Desk: http://localhost:8000/desk"
+echo "   - Builder: http://localhost:8000/apps/builder"
+echo "   - ERPNext: http://localhost:8000/apps/erpnext"
+echo "   - Webshop: http://localhost:8000/apps/webshop"
 
 echo "🚀 Starting Frappe services..."
-cd /home/frappe/frappe-bench
 bench start
