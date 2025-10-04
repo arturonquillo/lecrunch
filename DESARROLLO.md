@@ -89,4 +89,36 @@ docker compose restart frappe
 - ✅ **Deploy simple**: El setup funciona en cualquier máquina con Docker
 - ✅ **Performance**: Assets compilados, estilos funcionando correctamente
 
+## 🗄️ Sistema de Backups (NUEVO)
+
+### **Workflow Super Simple para Versionar Configuraciones:**
+
+```bash
+# 1. Configurar todo en el admin panel
+open http://localhost:8000
+# - Activar shopping cart
+# - Configurar ecommerce  
+# - Personalizar website
+
+# 2. Crear backup cuando esté listo
+./frappe-bench/backup_db.sh
+
+# 3. Versionar backup importante
+mv frappe-bench/backups/database_*.sql.gz frappe-bench/backups/production_v1.0_shopping_cart.sql.gz
+git add frappe-bench/backups/production_v1.0_shopping_cart.sql.gz
+git commit -m "🛒 Backup con shopping cart configurado"
+
+# 4. Colaboradores pueden usar tu configuración exacta
+git pull
+./frappe-bench/restore_db.sh frappe-bench/backups/production_v1.0_shopping_cart.sql.gz
+```
+
+### **¿Por qué Backups en lugar de Fixtures?**
+- ✅ **Súper simple**: Un comando vs configuración compleja
+- ✅ **100% completo**: TODA la configuración se respalda  
+- ✅ **Confiable**: Funciona siempre
+- ✅ **Colaborativo**: El equipo usa exactamente tu misma configuración
+
+📖 **Documentación completa:** `frappe-bench/backups/README.md`
+
 **¡A desarrollar se ha dicho!** 🚀✨
