@@ -81,6 +81,23 @@ bench get-app payments
 echo "📥 Getting Webshop..."
 bench get-app webshop
 
+# Install ModMoshe manually (simple approach)
+echo "📱 Installing ModMoshe app..."
+if [ -d "/workspace/modmoshe" ]; then
+    echo "   Copying ModMoshe app..."
+    cp -r /workspace/modmoshe ./apps/modmoshe
+    
+    echo "   Installing Python package..."
+    ./env/bin/pip install -e ./apps/modmoshe
+    
+    echo "   Adding to apps.txt..."
+    echo "modmoshe" >> apps.txt
+    
+    echo "✅ ModMoshe installed successfully!"
+else
+    echo "⚠️  ModMoshe directory not found at /workspace/modmoshe - skipping installation"
+fi
+
 # Create single site with all apps
 echo "🏗️  Creating main site (localhost)..."
 bench new-site localhost \
@@ -104,6 +121,16 @@ bench --site localhost install-app payments
 echo "📱 Installing Webshop on localhost..."
 bench --site localhost install-app webshop
 
+echo "📱 Installing ModMoshe on localhost..."
+if [ -d "/workspace/modmoshe" ] && [ -d "./apps/modmoshe" ]; then
+    # Create sites/apps.txt with all apps properly separated
+    echo -e "frappe\nerpnext\nbuilder\necommerce_integrations\npayments\nwebshop\nmodmoshe" > sites/apps.txt
+    bench --site localhost install-app modmoshe --force
+    echo "✅ ModMoshe installed successfully!"
+else
+    echo "⚠️  ModMoshe not prepared - skipping installation"
+fi
+
 echo "⚙️  Configuring site for development..."
 bench --site localhost set-config developer_mode 1
 bench --site localhost set-config mute_emails 1
@@ -120,6 +147,7 @@ echo "   - ERPNext: /apps/erpnext or /app"
 echo "   - Ecommerce Integrations: /apps/ecommerce_integrations"
 echo "   - Payments: /apps/payments"
 echo "   - Webshop: /apps/webshop"
+echo "   - ModMoshe: /apps/modmoshe (custom app)"
 
 echo "✅ Installation complete!"
 
