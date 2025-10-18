@@ -81,6 +81,10 @@ bench get-app payments
 echo "📥 Getting Webshop..."
 bench get-app webshop
 
+# Install Frappe CRM
+echo "📥 Getting Frappe CRM..."
+bench get-app crm --branch main
+
 # Install ModMoshe manually (simple approach)
 echo "📱 Installing ModMoshe app..."
 if [ -d "/workspace/modmoshe" ]; then
@@ -121,10 +125,13 @@ bench --site localhost install-app payments
 echo "📱 Installing Webshop on localhost..."
 bench --site localhost install-app webshop
 
+echo "📱 Installing Frappe CRM on localhost..."
+bench --site localhost install-app crm
+
 echo "📱 Installing ModMoshe on localhost..."
 if [ -d "/workspace/modmoshe" ] && [ -d "./apps/modmoshe" ]; then
     # Create sites/apps.txt with all apps properly separated
-    echo -e "frappe\nerpnext\nbuilder\necommerce_integrations\npayments\nwebshop\nmodmoshe" > sites/apps.txt
+    echo -e "frappe\nerpnext\nbuilder\necommerce_integrations\npayments\nwebshop\ncrm\nmodmoshe" > sites/apps.txt
     bench --site localhost install-app modmoshe --force
     echo "✅ ModMoshe installed successfully!"
 else
@@ -144,6 +151,7 @@ echo "📝 Available apps:"
 echo "   - Frappe Desk: /desk"
 echo "   - Builder: /apps/builder or /builder"  
 echo "   - ERPNext: /apps/erpnext or /app"
+echo "   - Frappe CRM: /crm"
 echo "   - Ecommerce Integrations: /apps/ecommerce_integrations"
 echo "   - Payments: /apps/payments"
 echo "   - Webshop: /apps/webshop"
