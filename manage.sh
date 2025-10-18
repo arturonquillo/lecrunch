@@ -11,11 +11,35 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Load environment variables
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE_PATH=${ENV_FILE_PATH:-"$SCRIPT_DIR/.env"}
+
+if [ -f "$ENV_FILE_PATH" ]; then
+    set -a
+    # shellcheck disable=SC1090
+    . "$ENV_FILE_PATH"
+    set +a
+fi
+
+SITE_NAME=${FRAPPE_SITE_NAME:-builder.localhost}
+
 # Function to print colored output
 print_color() {
     color=$1
     message=$2
     echo -e "${color}${message}${NC}"
+}
+
+show_access_info() {
+    print_color $BLUE "🌐 Access your site at: http://$SITE_NAME:8000"
+    print_color $BLUE "🔧 Builder interface: http://$SITE_NAME:8000/builder"
+    print_color $BLUE "👨‍💻 Dev server: http://$SITE_NAME:8080"
+    if [ -n "${FRAPPE_ADMIN_PASSWORD:-}" ]; then
+        print_color $BLUE "👤 Login: Administrator / (see FRAPPE_ADMIN_PASSWORD in .env)"
+    else
+        print_color $YELLOW "⚠️  Set FRAPPE_ADMIN_PASSWORD in your .env file before deploying."
+    fi
 }
 
 # Function to check if Docker is running
@@ -55,10 +79,7 @@ case "${1:-help}" in
         print_color $YELLOW "⚠️  First run may take 10-15 minutes to complete setup"
         docker compose up -d
         print_color $GREEN "✅ Services started! Check status with: ./manage.sh status"
-        print_color $BLUE "🌐 Access your site at: http://builder.localhost:8000"
-        print_color $BLUE "🔧 Builder interface: http://builder.localhost:8000/builder"
-        print_color $BLUE "👨‍💻 Dev server: http://builder.localhost:8080"
-        print_color $BLUE "👤 Login: Administrator / admin"
+        show_access_info
         ;;
     
     "stop"|"down")
@@ -73,6 +94,7 @@ case "${1:-help}" in
         print_color $YELLOW "🔄 Restarting all services..."
         docker compose restart
         print_color $GREEN "✅ All services restarted"
+        show_access_info
         ;;
     
     "logs")

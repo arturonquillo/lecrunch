@@ -8,11 +8,23 @@ RED='\033[0;31m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE_PATH=${ENV_FILE_PATH:-"$SCRIPT_DIR/.env"}
+
+if [ -f "$ENV_FILE_PATH" ]; then
+    set -a
+    # shellcheck disable=SC1090
+    . "$ENV_FILE_PATH"
+    set +a
+fi
+
+SITE_NAME=${FRAPPE_SITE_NAME:-builder.localhost}
+
 show_info() {
     echo -e "${GREEN}🌐 Acceso:${NC}"
-    echo "   • http://builder.localhost:8000"
-    echo "   • http://builder.localhost:8000/builder"
-    echo -e "${GREEN}🔑 Credenciales:${NC} Administrator / admin"
+    echo "   • http://$SITE_NAME:8000"
+    echo "   • http://$SITE_NAME:8000/builder"
+    echo -e "${GREEN}🔑 Credenciales:${NC} Administrator / (ver FRAPPE_ADMIN_PASSWORD en .env)"
 }
 
 case "$1" in

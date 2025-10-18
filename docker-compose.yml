@@ -7,11 +7,11 @@ services:
       - --skip-character-set-client-handshake
       - --skip-innodb-read-only-compressed
     environment:
-      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?Set MARIADB_ROOT_PASSWORD in your .env file}
     volumes:
       - mariadb-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
       timeout: 20s
       retries: 10
       interval: 5s
@@ -30,7 +30,19 @@ services:
     image: frappe/bench:latest
     command: bash /workspace/init.sh
     environment:
-      - SHELL=/bin/bash
+      SHELL: /bin/bash
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?Set MARIADB_ROOT_PASSWORD in your .env file}
+      FRAPPE_ADMIN_PASSWORD: ${FRAPPE_ADMIN_PASSWORD:?Set FRAPPE_ADMIN_PASSWORD in your .env file}
+      FRAPPE_SITE_NAME: ${FRAPPE_SITE_NAME:-localhost}
+      FRAPPE_DEFAULT_SITE: ${FRAPPE_DEFAULT_SITE:-}
+      FRAPPE_DEVELOPER_MODE: ${FRAPPE_DEVELOPER_MODE:-1}
+      FRAPPE_MUTE_EMAILS: ${FRAPPE_MUTE_EMAILS:-1}
+      FRAPPE_ADMIN_EMAIL: ${FRAPPE_ADMIN_EMAIL:-}
+      FRAPPE_DB_NAME: ${FRAPPE_DB_NAME:-}
+      FRAPPE_DB_PASSWORD: ${FRAPPE_DB_PASSWORD:-}
+      FRAPPE_ENCRYPTION_KEY: ${FRAPPE_ENCRYPTION_KEY:-}
+      FRAPPE_BENCH_VERSION: ${FRAPPE_BENCH_VERSION:-version-15}
+      YARN_NETWORK_TIMEOUT: ${YARN_NETWORK_TIMEOUT:-100000}
     working_dir: /home/frappe
     volumes:
       - .:/workspace

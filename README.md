@@ -35,7 +35,7 @@ Una vez completada la instalación, cada aplicación tiene su propio subdominio:
 
 ### 🔑 **Credenciales (para todos los sitios):**
 - Usuario: `Administrator`
-- Contraseña: `admin`-Subdomain Docker Setup ✨
+- Contraseña: definida en `FRAPPE_ADMIN_PASSWORD` dentro de tu archivo `.env`
 
 # Frappe Builder + ERPNext - Docker Setup ✨
 
@@ -90,7 +90,8 @@ Una vez completada la instalación:
 
 **Credenciales:**
 - Usuario: `Administrator`
-- Contraseña: `admin`
+- Contraseña: definida en `FRAPPE_ADMIN_PASSWORD` dentro de tu archivo `.env`
+- Cada reinicio del contenedor `frappe` sincroniza automáticamente la contraseña del administrador y otros ajustes (developer mode, mute emails, correo admin) con los valores del `.env`; si cambias la clave, reinicia el servicio para que se aplique.
 
 ## 🛠️ Comandos Útiles
 

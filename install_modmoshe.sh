@@ -2,6 +2,8 @@
 
 echo "=== INSTALLING MODMOSHE APP ==="
 
+FRAPPE_SITE_NAME=${FRAPPE_SITE_NAME:-localhost}
+
 # Wait for Frappe to be ready
 echo "⏳ Waiting for Frappe to be ready..."
 while ! curl -s http://localhost:8000 > /dev/null; do
@@ -40,7 +42,7 @@ if [ -d "/workspace/modmoshe" ]; then
     cat sites/apps.txt
     
     echo "   Installing on site..."
-    bench --site localhost install-app modmoshe --force
+    bench --site "$FRAPPE_SITE_NAME" install-app modmoshe --force
     
     echo "✅ ModMoshe installed successfully!"
 else

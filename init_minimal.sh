@@ -1,13 +1,53 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
+
+MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD:-}
+FRAPPE_ADMIN_PASSWORD=${FRAPPE_ADMIN_PASSWORD:-}
+FRAPPE_SITE_NAME=${FRAPPE_SITE_NAME:-localhost}
+FRAPPE_DEFAULT_SITE=${FRAPPE_DEFAULT_SITE:-$FRAPPE_SITE_NAME}
+FRAPPE_DEVELOPER_MODE=${FRAPPE_DEVELOPER_MODE:-1}
+FRAPPE_MUTE_EMAILS=${FRAPPE_MUTE_EMAILS:-1}
+FRAPPE_DB_NAME=${FRAPPE_DB_NAME:-}
+FRAPPE_DB_PASSWORD=${FRAPPE_DB_PASSWORD:-}
+FRAPPE_ENCRYPTION_KEY=${FRAPPE_ENCRYPTION_KEY:-}
+FRAPPE_BENCH_VERSION=${FRAPPE_BENCH_VERSION:-version-15}
+YARN_NETWORK_TIMEOUT=${YARN_NETWORK_TIMEOUT:-100000}
+
+if [ -z "$MARIADB_ROOT_PASSWORD" ]; then
+    echo "❌ Environment variable MARIADB_ROOT_PASSWORD is required."
+    exit 1
+fi
+
+if [ -z "$FRAPPE_ADMIN_PASSWORD" ]; then
+    echo "❌ Environment variable FRAPPE_ADMIN_PASSWORD is required."
+    exit 1
+fi
+
+sync_site_configuration() {
+    local site="$1"
+    echo "🔐 Syncing site configuration for $site..."
+    bench --site "$site" set-admin-password "$FRAPPE_ADMIN_PASSWORD"
+    bench --site "$site" set-config developer_mode "$FRAPPE_DEVELOPER_MODE"
+    bench --site "$site" set-config mute_emails "$FRAPPE_MUTE_EMAILS"
+
+    if [ -n "$FRAPPE_ENCRYPTION_KEY" ]; then
+        bench --site "$site" set-config encryption_key "$FRAPPE_ENCRYPTION_KEY"
+    fi
+
+    if [ -n "$FRAPPE_DB_PASSWORD" ]; then
+        bench --site "$site" set-config db_password "$FRAPPE_DB_PASSWORD"
+    fi
+
+    bench --site "$site" clear-cache
+}
 
 echo "=== FRAPPE + MODMOSHE MINIMAL INSTALLATION ==="
 
 # Function to wait for MariaDB
 wait_for_mariadb() {
     echo "⏳ Waiting for MariaDB..."
-    while ! mysqladmin ping -h mariadb -u root -p123 --silent; do
+    while ! mysqladmin ping -h mariadb -u root -p"$MARIADB_ROOT_PASSWORD" --silent; do
         sleep 2
     done
     echo "✅ MariaDB is ready!"
@@ -23,9 +63,11 @@ wait_for_redis() {
 }
 
 # Check if bench exists and has our custom app
-if [ -d "/home/frappe/frappe-bench/apps/modmoshe" ] && [ -d "/home/frappe/frappe-bench/sites/localhost" ]; then
+if [ -d "/home/frappe/frappe-bench/apps/modmoshe" ] && [ -d "/home/frappe/frappe-bench/sites/$FRAPPE_SITE_NAME" ]; then
     echo "🌐 ModMoshe setup exists, starting services..."
     cd /home/frappe/frappe-bench
+    sync_site_configuration "$FRAPPE_SITE_NAME"
+    bench use "$FRAPPE_DEFAULT_SITE"
     bench start
     exit 0
 fi
@@ -41,7 +83,7 @@ rm -rf /home/frappe/frappe-bench
 
 # Create bench with only Frappe
 echo "📦 Initializing minimal bench..."
-bench init --skip-redis-config-generation frappe-bench --version version-15
+bench init --skip-redis-config-generation frappe-bench --version "$FRAPPE_BENCH_VERSION"
 cd frappe-bench
 
 # Configure for Docker
@@ -74,26 +116,36 @@ else
 fi
 
 # Create site with minimal apps
-echo "🏗️  Creating main site (localhost)..."
-bench new-site localhost \
-    --force \
-    --mariadb-root-password 123 \
-    --admin-password admin \
+echo "🏗️  Creating main site ($FRAPPE_SITE_NAME)..."
+bench_new_site_args=(
+    "$FRAPPE_SITE_NAME"
+    --force
+    --mariadb-root-password "$MARIADB_ROOT_PASSWORD"
+    --admin-password "$FRAPPE_ADMIN_PASSWORD"
     --no-mariadb-socket
+)
 
-echo "📱 Installing ModMoshe on localhost..."
+if [ -n "$FRAPPE_DB_NAME" ]; then
+    bench_new_site_args+=(--db-name "$FRAPPE_DB_NAME")
+fi
+
+if [ -n "$FRAPPE_DB_PASSWORD" ]; then
+    bench_new_site_args+=(--db-password "$FRAPPE_DB_PASSWORD")
+fi
+
+bench new-site "${bench_new_site_args[@]}"
+
+echo "📱 Installing ModMoshe on $FRAPPE_SITE_NAME..."
 echo "   Final verification before installation..."
 cat apps.txt
 ls -la apps/
-bench --site localhost install-app modmoshe
+bench --site "$FRAPPE_SITE_NAME" install-app modmoshe
 
-echo "⚙️  Configuring site for development..."
-bench --site localhost set-config developer_mode 1
-bench --site localhost set-config mute_emails 1
-bench --site localhost clear-cache
+echo "⚙️  Applying site configuration from environment..."
+sync_site_configuration "$FRAPPE_SITE_NAME"
 
 # Set as default site
-bench use localhost
+bench use "$FRAPPE_DEFAULT_SITE"
 
 echo "✅ Minimal installation complete!"
 echo "📝 Available apps:"
