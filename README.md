@@ -92,6 +92,7 @@ Una vez completada la instalación:
 - Usuario: `Administrator`
 - Contraseña: definida en `FRAPPE_ADMIN_PASSWORD` dentro de tu archivo `.env`
 - Cada reinicio del contenedor `frappe` sincroniza automáticamente la contraseña del administrador y otros ajustes (developer mode, mute emails, correo admin) con los valores del `.env`; si cambias la clave, reinicia el servicio para que se aplique.
+- Para respaldos completos y restauraciones usa `./backup.sh` (almacena todo en `./backups/<timestamp>/` y `./backup.sh restore <timestamp>` recupera el sitio).
 
 ## 🛠️ Comandos Útiles
 
@@ -111,6 +112,15 @@ docker compose up -d
 
 # Acceder al contenedor
 docker compose exec frappe bash
+
+# Respaldo completo (DB + archivos)
+./backup.sh create
+
+# Listar respaldos disponibles
+./backup.sh list
+
+# Restaurar un respaldo por ID (usa el identificador listado)
+./backup.sh restore 20240212_153000
 ```
 
 ## 📁 Estructura
