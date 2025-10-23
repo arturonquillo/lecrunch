@@ -31,6 +31,7 @@ MUTE_EMAILS=${FRAPPE_MUTE_EMAILS:-1}
 ADMIN_EMAIL=${FRAPPE_ADMIN_EMAIL:-}
 ENCRYPTION_KEY=${FRAPPE_ENCRYPTION_KEY:-}
 DB_PASSWORD=${FRAPPE_DB_PASSWORD:-}
+SITE_DOMAIN=${FRAPPE_DOMAIN:-}
 
 # Cleanup en caso de interrupción
 cleanup() {
@@ -94,6 +95,13 @@ apply_site_configuration() {
             --env BENCH_SITE="$SITE_NAME" \
             --env BENCH_DB_PASSWORD="$DB_PASSWORD" \
             frappe bash -lc 'cd frappe-bench && bench --site "$BENCH_SITE" set-config db_password "$BENCH_DB_PASSWORD"'
+    fi
+
+    if [ -n "$SITE_DOMAIN" ]; then
+        docker compose exec \
+            --env BENCH_SITE="$SITE_NAME" \
+            --env BENCH_HOST_NAME="$SITE_DOMAIN" \
+            frappe bash -lc 'cd frappe-bench && bench --site "$BENCH_SITE" set-config host_name "$BENCH_HOST_NAME"'
     fi
 
     docker compose exec frappe bash -c "cd frappe-bench && bench --site $SITE_NAME clear-cache"

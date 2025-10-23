@@ -13,6 +13,7 @@ FRAPPE_DB_PASSWORD=${FRAPPE_DB_PASSWORD:-}
 FRAPPE_ENCRYPTION_KEY=${FRAPPE_ENCRYPTION_KEY:-}
 FRAPPE_BENCH_VERSION=${FRAPPE_BENCH_VERSION:-version-15}
 YARN_NETWORK_TIMEOUT=${YARN_NETWORK_TIMEOUT:-100000}
+FRAPPE_DOMAIN=${FRAPPE_DOMAIN:-}
 
 if [ -z "$MARIADB_ROOT_PASSWORD" ]; then
     echo "❌ Environment variable MARIADB_ROOT_PASSWORD is required."
@@ -37,6 +38,10 @@ sync_site_configuration() {
 
     if [ -n "$FRAPPE_DB_PASSWORD" ]; then
         bench --site "$site" set-config db_password "$FRAPPE_DB_PASSWORD"
+    fi
+
+    if [ -n "$FRAPPE_DOMAIN" ]; then
+        bench --site "$site" set-config host_name "$FRAPPE_DOMAIN"
     fi
 
     bench --site "$site" clear-cache

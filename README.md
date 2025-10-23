@@ -81,12 +81,14 @@ Cliente → localhost:8000
 
 ## 🌐 Acceso
 
-Una vez completada la instalación:
+Una vez completada la instalación (con Caddy como proxy inverso):
 
-- **🏠 Sitio principal**: http://builder.localhost:8000
-- **🔧 Builder interface**: http://builder.localhost:8000/builder
-- **� ERPNext**: http://builder.localhost:8000/desk
-- **�👨‍💻 Dev server**: http://builder.localhost:8080
+- **🏠 Sitio principal**: https://frappe.localhost (usar tu dominio real en producción)
+- **🔧 Builder interface**: https://frappe.localhost/builder
+- **📊 ERPNext**: https://frappe.localhost/desk
+- **🛠️ Portainer**: https://portainer.localhost (gestión de contenedores)
+
+Agrega entradas a tu archivo `hosts` para los dominios definidos en `.env` (por ejemplo `127.0.0.1 frappe.localhost portainer.localhost`) o apunta tus DNS públicos si estás en producción.
 
 **Credenciales:**
 - Usuario: `Administrator`
@@ -127,11 +129,17 @@ docker compose exec frappe bash
 
 ```
 frape2/
-├── docker-compose.yml    # Servicios Docker simples
-├── init.sh              # Script instalación sitio único con múltiples apps
-├── manage.sh            # Comandos útiles
-├── status.sh            # Verificar estado
-└── README.md           # Este archivo
+├── docker-compose.yml     # Servicios Docker + Caddy
+├── Caddyfile              # Reverse proxy (Frappe / Portainer)
+├── init.sh                # Script instalación sitio único con múltiples apps
+├── init_minimal.sh        # Variante mínima (Frappe + ModMoshe)
+├── init_clean.sh          # Instalación guiada con docker compose
+├── manage.sh              # Comandos útiles (versión extendida)
+├── manage_clean.sh        # Comandos útiles (simplificado)
+├── backup.sh              # Respaldos y restauración del sitio
+├── status.sh              # Verificar estado
+├── .env / .env.production # Configuración de credenciales y dominios
+└── README.md              # Este archivo
 ```
 
 ## 🔧 Servicios
@@ -151,13 +159,14 @@ frape2/
 - ✅ **Dependencias Node.js** instaladas correctamente
 - ✅ **Script robusto** con manejo de errores
 - ✅ **Acceso unificado** a todas las aplicaciones
+- ✅ **Reverse proxy Caddy** sirviendo dominios amigables y HTTPS automático
 
 ## 🐛 Solución de Problemas
 
 Si algo no funciona:
 
 1. Verificar que Docker esté corriendo
-2. Verificar que `/etc/hosts` tenga: `127.0.0.1 builder.localhost`
+2. Verificar que `/etc/hosts` tenga tus dominios apuntando a `127.0.0.1` (por ejemplo `frappe.localhost` y `portainer.localhost`)
 3. Esperar a que aparezcan requests HTTP en los logs
 4. Si hay errores, reiniciar: `docker compose down -v && docker compose up -d`
 

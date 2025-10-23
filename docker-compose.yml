@@ -43,13 +43,10 @@ services:
       FRAPPE_ENCRYPTION_KEY: ${FRAPPE_ENCRYPTION_KEY:-}
       FRAPPE_BENCH_VERSION: ${FRAPPE_BENCH_VERSION:-version-15}
       YARN_NETWORK_TIMEOUT: ${YARN_NETWORK_TIMEOUT:-100000}
+      FRAPPE_DOMAIN: ${FRAPPE_DOMAIN:-}
     working_dir: /home/frappe
     volumes:
       - .:/workspace
-    ports:
-      - "8000:8000"  # Main Frappe site
-      - "9000:9000"  # Socketio
-      - "8080:8080"  # Frontend dev server
     depends_on:
       mariadb:
         condition: service_healthy
@@ -60,13 +57,31 @@ services:
   portainer:
     image: portainer/portainer-ce:latest
     command: -H unix:///var/run/docker.sock
-    ports:
-      - "9443:9443"  # Portainer UI (HTTPS)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer-data:/data
     restart: unless-stopped
 
+  caddy:
+    image: caddy:latest
+    depends_on:
+      - frappe
+      - portainer
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      CADDY_ADMIN_EMAIL: ${CADDY_ADMIN_EMAIL:-}
+      FRAPPE_DOMAIN: ${FRAPPE_DOMAIN:?Define FRAPPE_DOMAIN in .env}
+      PORTAINER_DOMAIN: ${PORTAINER_DOMAIN:?Define PORTAINER_DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+
 volumes:
   mariadb-data:
   portainer-data:
+  caddy-data:
+  caddy-config:

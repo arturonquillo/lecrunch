@@ -1,0 +1,11 @@
+{
+    email {$CADDY_ADMIN_EMAIL}
+}
+
+{$FRAPPE_DOMAIN} {
+    reverse_proxy frappe:8000
+}
+
+{$PORTAINER_DOMAIN} {
+    reverse_proxy portainer:9000
+}
